@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace DifferLib
 {
-    public sealed class Differ
+    public sealed class Differ<T>
     {
-        private string TextFrom { get; }
-        private string TextTo { get; }
+        private T[] TextFrom { get; }
+        private T[] TextTo { get; }
 
-        public Differ(string textFrom, string textTo)
+        public Differ(T[] textFrom, T[] textTo)
         {
             TextFrom = textFrom;
             TextTo = textTo;
@@ -58,7 +58,7 @@ namespace DifferLib
             var y = x - diagonal;
             while (0 <= x && x < TextFrom.Length
                 && 0 <= y && y < TextTo.Length
-                && TextFrom[x] == TextTo[y])
+                && EqualityComparer<T>.Default.Equals(TextFrom[x], TextTo[y]))
             {
                 ++snakeLength;
                 ++x;

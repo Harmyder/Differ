@@ -11,7 +11,7 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestSameStringsSingleton()
         {
-            var differ = new Differ("a", "a");
+            var differ = new Differ<char>("a".ToCharArray(), "a".ToCharArray());
             var (deleted, inserted) = differ.Compute();
             Assert.IsFalse(deleted.Any());
             Assert.IsFalse(inserted.Any());
@@ -20,7 +20,7 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestSameStringsMultichars()
         {
-            var differ = new Differ("abc", "abc");
+            var differ = new Differ<char>("abc".ToCharArray(), "abc".ToCharArray());
             var (deleted, inserted) = differ.Compute();
             Assert.IsFalse(deleted.Any());
             Assert.IsFalse(inserted.Any());
@@ -29,7 +29,7 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestEmpty()
         {
-            var differ = new Differ("", "");
+            var differ = new Differ<char>("".ToCharArray(), "".ToCharArray());
             var (deleted, inserted) = differ.Compute();
             Assert.IsFalse(deleted.Any());
             Assert.IsFalse(inserted.Any());
@@ -50,21 +50,28 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestOptimality() => Test("abceb", "acbd", 3);
 
-        private void Test(string from, string to, int? nonDiagonalCount = null)
+        [TestMethod]
+        public void TestLines() => Test(new[] { "abc", "def", "ghi" }, new[] { "abc", "def", "jkl" });
+
+        private void Test(string from, string to, int? nonDiagonalCount = null) => TestInternal<char>(from.ToCharArray(), to.ToCharArray(), nonDiagonalCount);
+
+        private void Test(string[] from, string[] to, int? nonDiagonalCount = null) => TestInternal<string>(from, to, nonDiagonalCount);
+
+        private void TestInternal<T>(T[] from, T[] to, int? nonDiagonalCount = null)
         {
-            var differ = new Differ(from, to);
+            var differ = new Differ<T>(from, to);
             var (deletes, inserts) = differ.Compute();
-            var actual = ApplyOperations(from, to, deletes, inserts);
-            Assert.AreEqual(to, actual);
+            var actual = ApplyOperations(from.ToList(), to.ToList(), deletes, inserts).ToArray();
+            Assert.IsTrue(Enumerable.SequenceEqual(to, actual));
             if (nonDiagonalCount != null) Assert.AreEqual(nonDiagonalCount, deletes.Count + inserts.Count);
         }
 
-        private string ApplyOperations(string from, string to, IReadOnlyList<DeleteOperation> deletes, IReadOnlyList<InsertOperation> inserts)
+        private List<T> ApplyOperations<T>(List<T> from, List<T> to, IReadOnlyList<DeleteOperation> deletes, IReadOnlyList<InsertOperation> inserts)
         {
             var insertIndex = inserts.Count - 1;
             var deleteIndex = deletes.Count - 1;
 
-            for (int i = from.Length; i >= 0; --i)
+            for (int i = from.Count; i >= 0; --i)
             {
                 var shouldInsert = false;
                 var shouldDelete = false;
@@ -72,14 +79,14 @@ namespace DifferLib.Tests
                 if (insertIndex >= 0 && inserts[insertIndex].StartOriginal == i)
                 {
                     shouldInsert = true;
-                    from = from.Insert(i, to.Substring(inserts[insertIndex].StartNew, inserts[insertIndex].Length));
+                    from.InsertRange(i, to.GetRange(inserts[insertIndex].StartNew, inserts[insertIndex].Length));
                     insertIndex -= 1;
                 }
 
                 if (deleteIndex >= 0 && deletes[deleteIndex].StartOriginal == i)
                 {
                     shouldDelete = true;
-                    from = from.Remove(i, deletes[deleteIndex].Length);
+                    from.RemoveRange(i, deletes[deleteIndex].Length);
                     deleteIndex -= 1;
                 }
 
