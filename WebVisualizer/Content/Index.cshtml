@@ -1,0 +1,67 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style>
+    .before {
+        grid-area: before;
+    }
+
+    .after {
+        grid-area: after;
+    }
+
+    .submit {
+        grid-area: submit;
+    }
+
+    .beforeComputed {
+        background-color: lightgray;
+        grid-area: beforeComputed;
+    }
+
+    .afterComputed {
+        background-color: lightgray;
+        grid-area: afterComputed;
+    }
+
+    .wrapper {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-auto-rows: auto;
+        grid-gap: 5px;
+        grid-template-areas:
+            "before         after"
+            "submit         ."
+            "beforeComputed afterComputed";
+    }
+
+    .deleteBlock {
+        background-color: lightcoral;
+    }
+
+    .insertBlock {
+        background-color: lightgreen;
+    }
+
+    .column {
+        display: flex;
+    }
+
+    .computed {
+        white-space: pre-wrap;
+    }
+</style>
+
+<form method="post" class="column">
+    <div class="wrapper">
+        <div class="before"><textarea id="before" name="before" rows="20" cols="100">@Model.Before</textarea></div>
+        <div class="after"><textarea id="after" name="after" rows="20" cols="100">@Model.After</textarea></div>
+        <div class="submit" value="Compute"><input type="submit" /></div>
+        <div class="beforeComputed computed">@Html.Raw(Model.BeforeComputed)</div>
+        <div class="afterComputed computed">@Html.Raw(Model.AfterComputed)</div>
+    </div>
+</form>
+
