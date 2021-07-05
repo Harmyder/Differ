@@ -1,6 +1,9 @@
+using DifferLib;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Text;
 
 namespace WebVisualizer.Content
 {
@@ -11,11 +14,23 @@ namespace WebVisualizer.Content
         public string BeforeComputed { get; set; } = "";
         public string AfterComputed { get; set; } = "";
 
+        private const string InsertLineStart = "<span class=\"insertLine\">";
+        private const string InsertBlockStart = "<span class=\"insertBlock\">";
+        private const string DeleteLineStart = "<span class=\"deleteLine\">";
+        private const string DeleteBlockStart = "<span class=\"deleteBlock\">";
+        private const string End = "</span>";
+
+        private readonly Highlighter _highlighter;
+
         private readonly ILogger<IndexModel> _logger;
 
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
+
+            var deleteSettings = new HighlighterSettings(DeleteLineStart, End, DeleteBlockStart, End);
+            var insertSettings = new HighlighterSettings(InsertLineStart, End, InsertBlockStart, End);
+            _highlighter = new Highlighter(deleteSettings, insertSettings);
         }
 
         public void OnGet()
@@ -26,32 +41,17 @@ namespace WebVisualizer.Content
 
         public void OnPost([FromForm] string before, [FromForm] string after)
         {
-            Before =  before;
+            Before = before;
             After = after;
 
             Response.Cookies.Append("Before", Before);
             Response.Cookies.Append("After", After);
 
-            var differ = new DifferLib.Differ<char>(Before.ToCharArray(), After.ToCharArray());
+            var differ = new Differ<char>(Before.ToCharArray(), After.ToCharArray());
             var (deletes, inserts) = differ.Compute();
 
-            var curBeforeIndex = 0;
-            foreach (var delete in deletes)
-            {
-                if (delete.StartOriginal > curBeforeIndex) BeforeComputed += Before.Substring(curBeforeIndex, delete.StartOriginal - curBeforeIndex);
-                BeforeComputed += "<span class=\"deleteBlock\">" + Before.Substring(delete.StartOriginal, delete.Length) + "</span>";
-                curBeforeIndex = delete.StartOriginal + delete.Length;
-            }
-            BeforeComputed += Before.Substring(curBeforeIndex);
-
-            var curAfterIndex = 0;
-            foreach (var insert in inserts)
-            {
-                if (insert.StartNew > curAfterIndex) AfterComputed += After.Substring(curAfterIndex, insert.StartNew - curAfterIndex);
-                AfterComputed += "<span class=\"insertBlock\">" + After.Substring(insert.StartNew, insert.Length) + "</span>";
-                curAfterIndex = insert.StartNew + insert.Length;
-            }
-            AfterComputed += After.Substring(curAfterIndex);
+            BeforeComputed = _highlighter.HighlightDelete(Before, deletes);
+            AfterComputed = _highlighter.HighlightInsert(After, inserts);
         }
     }
 }

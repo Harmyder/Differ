@@ -14,12 +14,12 @@ namespace DifferLib
             TextTo = textTo;
         }
 
-        public (List<DeleteOperation> Deletes, List<InsertOperation> Inserts) Compute()
+        public (List<SubstringDescriptor> Deletes, List<SubstringDescriptor> Inserts) Compute()
         {
             var steps = ComputeInternal();
 
-            var deletes = new List<DeleteOperation>();
-            var inserts = new List<InsertOperation>();
+            var deletes = new List<SubstringDescriptor>();
+            var inserts = new List<SubstringDescriptor>();
 
             var curX = 0;
             var curY = 0;
@@ -36,12 +36,12 @@ namespace DifferLib
                         break;
                     case StepId.Horizontal:
                         while (steps.Count > i + ++span && steps[i + span] == StepId.Horizontal) ;
-                        deletes.Add(new DeleteOperation(curX, span));
+                        deletes.Add(new SubstringDescriptor(curX, span));
                         curX += span;
                         break;
                     case StepId.Vertical:
                         while (steps.Count > i + ++span && steps[i + span] == StepId.Vertical) ;
-                        inserts.Add(new InsertOperation(curX, curY, span));
+                        inserts.Add(new SubstringDescriptor(curY, span));
                         curY += span;
                         break;
                 }

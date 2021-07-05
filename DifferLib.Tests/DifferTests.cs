@@ -66,24 +66,32 @@ namespace DifferLib.Tests
             if (nonDiagonalCount != null) Assert.AreEqual(nonDiagonalCount, deletes.Count + inserts.Count);
         }
 
-        private List<T> ApplyOperations<T>(List<T> from, List<T> to, IReadOnlyList<DeleteOperation> deletes, IReadOnlyList<InsertOperation> inserts)
+        private List<T> ApplyOperations<T>(List<T> from, List<T> to, IReadOnlyList<SubstringDescriptor> deletes, IReadOnlyList<SubstringDescriptor> inserts)
         {
             var insertIndex = inserts.Count - 1;
             var deleteIndex = deletes.Count - 1;
+
+            var insertedCount = 0;
 
             for (int i = from.Count; i >= 0; --i)
             {
                 var shouldInsert = false;
                 var shouldDelete = false;
 
-                if (insertIndex >= 0 && inserts[insertIndex].StartOriginal == i)
+                if (insertIndex >= 0)
                 {
-                    shouldInsert = true;
-                    from.InsertRange(i, to.GetRange(inserts[insertIndex].StartNew, inserts[insertIndex].Length));
-                    insertIndex -= 1;
+                    var aliveCount = to.Count - inserts[insertIndex].Start - (insertedCount + inserts[insertIndex].Length);
+
+                    if (from.Count - aliveCount == i)
+                    {
+                        shouldInsert = true;
+                        from.InsertRange(i, to.GetRange(inserts[insertIndex].Start, inserts[insertIndex].Length));
+                        insertedCount += inserts[insertIndex].Length;
+                        insertIndex -= 1;
+                    }
                 }
 
-                if (deleteIndex >= 0 && deletes[deleteIndex].StartOriginal == i)
+                if (deleteIndex >= 0 && deletes[deleteIndex].Start == i)
                 {
                     shouldDelete = true;
                     from.RemoveRange(i, deletes[deleteIndex].Length);
