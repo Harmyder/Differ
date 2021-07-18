@@ -1,86 +1,163 @@
-﻿using DifferLib.Utils;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace DifferLib
 {
-    public sealed class Highlighter
+    public static class Highlighter
     {
-        private readonly HighlighterSettings _deleteSettings;
-        private readonly HighlighterSettings _insertSettings;
-
-        public Highlighter(HighlighterSettings deleteSettings, HighlighterSettings insertSettings)
+        public static List<(HighlightedLine Before, HighlightedLine After)> Highlight(string before, string after, List<SubstringDescriptor> deleteDescs, List<SubstringDescriptor> insertDescs)
         {
-            _deleteSettings = deleteSettings;
-            _insertSettings = insertSettings;
+            if (before == null) throw new ArgumentNullException(nameof(before));
+            if (after == null) throw new ArgumentNullException(nameof(after));
+            if (deleteDescs == null) throw new ArgumentNullException(nameof(deleteDescs));
+            if (insertDescs == null) throw new ArgumentNullException(nameof(insertDescs));
+
+            var highlightedBefore = ComputeLines(before, deleteDescs);
+            var highlightedAfter = ComputeLines(after, insertDescs);
+
+            var pairs = LinesMatcher(highlightedBefore, highlightedAfter);
+            return pairs;
         }
 
-        public string HighlightDelete(string source, List<SubstringDescriptor> descriptors) => HighlightInternal(source, descriptors, _deleteSettings);
-        public string HighlightInsert(string source, List<SubstringDescriptor> descriptors) => HighlightInternal(source, descriptors, _insertSettings);
-
-
-        public static string HighlightInternal(string source, List<SubstringDescriptor> descriptors, HighlighterSettings settings)
+        private static List<(HighlightedLine Before, HighlightedLine After)> LinesMatcher(HighlightedLine[] before, HighlightedLine[] after)
         {
-            var lines = SplitByLines(source);
-            var builder = new StringBuilder(source.Length + descriptors.Count * (settings.GetTotalLength()));
-            var sourceIndex = 0;
-            var curDeleteIndex = 0;
-            foreach (var line in lines)
+            var pairs = new List<(HighlightedLine Before, HighlightedLine After)>();
+
+            var beforeIndex = 0;
+            var afterIndex = 0;
+            var beforeRetainedLineStart = 0;
+            var afterRetainedLineStart = 0;
+
+            while (beforeIndex < before.Length || afterIndex < after.Length)
             {
-                var lineEndIndex = line.Start + line.Length;
-                if (curDeleteIndex < descriptors.Count && descriptors[curDeleteIndex].Start < lineEndIndex)
+                while (IsFullyHighlighted(before, beforeIndex))
                 {
-                    builder.Append(settings.LineStart);
-
-                    do
+                    var shouldGoInPair = false;
+                    if (IsFullyHighlighted(after, afterIndex))
                     {
-                        var isLeftover = descriptors[curDeleteIndex].Start < line.Start;
-                        if (!isLeftover)
-                        {
-                            builder.AppendWithAccounting(source, ref sourceIndex, descriptors[curDeleteIndex].Start - sourceIndex);
-                        }
-
-                        builder.Append(settings.BlockStart);
-
-                        if (descriptors[curDeleteIndex].End <= lineEndIndex)
-                        {
-                            builder.AppendWithAccounting(source, ref sourceIndex, descriptors[curDeleteIndex].End - sourceIndex);
-                            builder.Append(settings.BlockEnd);
-                            curDeleteIndex += 1;
-                        }
-                        else
-                        {
-                            builder.AppendWithAccounting(source, ref sourceIndex, lineEndIndex - sourceIndex);
-                            builder.Append(settings.BlockEnd);
-                            break;
-                        }
+                        shouldGoInPair = true;
+                        afterIndex += 1;
                     }
-                    while (curDeleteIndex < descriptors.Count && descriptors[curDeleteIndex].Start < lineEndIndex);
 
-                    builder.AppendWithAccounting(source, ref sourceIndex, lineEndIndex - sourceIndex);
+                    pairs.Add((before[beforeIndex++], shouldGoInPair ? after[afterIndex - 1] : null));
+                }
 
-                    builder.Append(settings.LineEnd);
+                while (IsFullyHighlighted(after, afterIndex))
+                {
+                    pairs.Add((null, after[afterIndex]));
+                    afterIndex += 1;
+                }
+
+                if (beforeRetainedLineStart != afterRetainedLineStart)
+                {
+                    throw new InvalidProgramException($"After can't be different from before - {afterRetainedLineStart} against {beforeRetainedLineStart}");
+                }
+
+                if (beforeIndex < before.Length)
+                {
+                    var retained = before[beforeIndex].Regular.Sum(b => b.Length);
+                    beforeRetainedLineStart += retained;
+
+                    if (afterIndex >= after.Length)
+                    {
+                        throw new InvalidProgramException($"There are not enough after lines. {beforeIndex}:{before.Length} - {afterIndex}:{after.Length}");
+                    }
+
+                    afterRetainedLineStart += retained;
+                    pairs.Add((before[beforeIndex++], after[afterIndex++]));
                 }
                 else
                 {
-                    builder.AppendWithAccounting(source, ref sourceIndex, lineEndIndex - sourceIndex);
+                    if (afterIndex < after.Length)
+                    {
+                        throw new InvalidProgramException($"There are not enough before lines. {beforeIndex}:{before.Length} - {afterIndex}:{after.Length}");
+                    }
                 }
             }
 
-            return builder.ToString();
+            return pairs;
         }
 
-        private static IReadOnlyList<(int Start, int Length)> SplitByLines(string input)
+        private static bool IsFullyHighlighted(HighlightedLine[] lines, int index)
         {
-            var ret = new List<(int Start, int Length)>();
+            return index < lines.Length && lines[index].Regular.Sum(b => b.Length) == 0;
+        }
+
+        private static HighlightedLine[] ComputeLines(
+            string source,
+            List<SubstringDescriptor> descs)
+        {
+            var sourceIndex = 0;
+            var curDescIndex = 0;
+            var lines = SplitByLines(source);
+
+            var highlightedLines = new HighlightedLine[lines.Count];
+
+            for (int i = 0; i < lines.Count; ++i)
+            {
+                var line = lines[i];
+
+                var highlightedLineFactory = new HighlightedLineFactory();
+
+                if (curDescIndex < descs.Count && descs[curDescIndex].Start < line.End)
+                {
+                    do
+                    {
+                        var isLeftover = descs[curDescIndex].Start < line.Start;
+                        if (!isLeftover)
+                        {
+                            highlightedLineFactory.Add(source, ref sourceIndex, descs[curDescIndex].Start - sourceIndex);
+                        }
+
+                        if (descs[curDescIndex].End <= line.End)
+                        {
+                            highlightedLineFactory.AddHighlighted(source, ref sourceIndex, descs[curDescIndex].End - sourceIndex);
+                            curDescIndex += 1;
+                        }
+                        else
+                        {
+                            highlightedLineFactory.AddHighlighted(source, ref sourceIndex, line.End - sourceIndex);
+                            break;
+                        }
+                    }
+                    while (curDescIndex < descs.Count && descs[curDescIndex].Start < line.End);
+                }
+
+                if (line.End - sourceIndex != 0)
+                {
+                    highlightedLineFactory.Add(source, ref sourceIndex, line.End - sourceIndex);
+                }
+
+                highlightedLines[i] = highlightedLineFactory.Create();
+            }
+
+            return highlightedLines;
+        }
+
+        private static IReadOnlyList<Line> SplitByLines(string input)
+        {
+            var ret = new List<Line>();
             for (int i = 0; i < input.Length;)
             {
                 var nextLineStartIndex = input.IndexOf('\n', i) + 1;
                 if (nextLineStartIndex == 0) nextLineStartIndex = input.Length;
-                ret.Add((i, nextLineStartIndex - i));
+                ret.Add(new Line(i, nextLineStartIndex - i));
                 i = nextLineStartIndex;
             }
             return ret;
+        }
+
+        private struct Line
+        {
+            public int Start { get; }
+            public int End => Start + Length;
+            public int Length { get; }
+            public Line(int start, int length)
+            {
+                Start = start;
+                Length = length;
+            }
         }
     }
 }

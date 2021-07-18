@@ -17,14 +17,10 @@
         grid-area: submit;
     }
 
-    .beforeComputed {
-        background-color: lightgray;
-        grid-area: beforeComputed;
-    }
-
-    .afterComputed {
-        background-color: lightgray;
-        grid-area: afterComputed;
+    .computed {
+        background-color: #EEEEEE;
+        grid-area: computed;
+        white-space: nowrap;
     }
 
     .wrapper {
@@ -35,7 +31,12 @@
         grid-template-areas:
             "before         after"
             "submit         ."
-            "beforeComputed afterComputed";
+            "computed       computed";
+    }
+
+    .lineNumberBlock {
+        color: #888888;
+        text-align: center;
     }
 
     .deleteBlock {
@@ -57,10 +58,6 @@
     .column {
         display: flex;
     }
-
-    .computed {
-        white-space: pre-wrap;
-    }
 </style>
 
 <form method="post" class="column">
@@ -68,8 +65,51 @@
         <div class="before"><textarea id="before" name="before" rows="20" cols="100">@Model.Before</textarea></div>
         <div class="after"><textarea id="after" name="after" rows="20" cols="100">@Model.After</textarea></div>
         <div class="submit" value="Compute"><input type="submit" /></div>
-        <div class="beforeComputed computed">@Html.Raw(Model.BeforeComputed)</div>
-        <div class="afterComputed computed">@Html.Raw(Model.AfterComputed)</div>
+        <table class="computed">
+            @for (int i = 0, beforeIndex = 0, afterIndex = 0; i < Model.Highlighted.Length; ++i)
+            {
+            <tr>
+                @if (Model.Highlighted[i].Before != null)
+                {
+                    beforeIndex += 1;
+                    <td class="lineNumberBlock">@beforeIndex</td>
+                    <td class="@(Model.Highlighted[i].Before.Count > 1 ? "deleteLine":"")">
+                            @for (var b = 0; b < Model.Highlighted[i].Before.Count; ++b)
+                            {
+                                @if (b % 2 == 0)
+                                {<span class="">@Model.Highlighted[i].Before[b]</span>}
+                                else
+                                {<span class="deleteBlock">@Model.Highlighted[i].Before[b]</span>}
+                            }
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                    <td></td>
+                }
+                @if (Model.Highlighted[i].After != null)
+                {
+                    afterIndex += 1;
+                    <td class="lineNumberBlock">@afterIndex</td>
+                    <td class="@(Model.Highlighted[i].After.Count > 1 ? "insertLine":"")">
+                            @for (var b = 0; b < Model.Highlighted[i].After.Count; ++b)
+                            {
+                                @if (b % 2 == 0)
+                                {<span class="">@Model.Highlighted[i].After[b]</span>}
+                                else
+                                {<span class="insertBlock">@Model.Highlighted[i].After[b]</span>}
+                            }
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                    <td></td>
+                }
+            </tr>
+            }
+        </table>
     </div>
 </form>
 

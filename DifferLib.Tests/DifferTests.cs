@@ -36,6 +36,16 @@ namespace DifferLib.Tests
         }
 
         [TestMethod]
+        public void TestLineMatching()
+        {
+            var differ = new Differ<char>("_\n*\n".ToCharArray(), "*\n".ToCharArray());
+            var (deletes, _) = differ.Compute();
+            Assert.AreEqual(1, deletes.Count);
+            Assert.AreEqual(0, deletes[0].Start);
+            Assert.AreEqual(2, deletes[0].Length);
+        }
+
+        [TestMethod]
         public void TestLengthOneDelete() => Test("a", "");
 
         [TestMethod]
