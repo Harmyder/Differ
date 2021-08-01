@@ -1,0 +1,53 @@
+﻿.before {
+    grid-area: before;
+}
+
+.after {
+    grid-area: after;
+}
+
+.submit {
+    grid-area: submit;
+}
+
+.computed {
+    background-color: #EEEEEE;
+    grid-area: computed;
+    white-space: nowrap;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-auto-rows: auto;
+    grid-gap: 5px;
+    grid-template-areas:
+        "before         after"
+        "submit         ."
+        "computed       computed";
+}
+
+.lineNumberBlock {
+    color: #888888;
+    text-align: center;
+}
+
+.deleteBlock {
+    background-color: #FFAAAA;
+}
+
+.insertBlock {
+    background-color: #AAFFAA;
+}
+
+.deleteLine {
+    background-color: #FFDDDD;
+}
+
+.insertLine {
+    background-color: #DDFFDD;
+}
+
+.column {
+    display: flex;
+}
