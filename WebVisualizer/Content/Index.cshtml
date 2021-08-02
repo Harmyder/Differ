@@ -21,12 +21,12 @@
         <table class="computed">
             @for (int i = 0, beforeIndex = 0, afterIndex = 0; i < Model.Highlighted.Length; ++i)
             {
-            <tr>
-                @if (Model.Highlighted[i].Before != null)
-                {
-                    beforeIndex += 1;
-                    <td class="lineNumberBlock">@beforeIndex</td>
-                    <td class="@(Model.Highlighted[i].Before.Count > 1 ? "deleteLine":"")">
+                <tr>
+                    @if (Model.Highlighted[i].Before != null)
+                    {
+                        beforeIndex += 1;
+                        <td class="lineNumberBlock">@beforeIndex</td>
+                        <td class="@(Model.Highlighted[i].Before.Count > 1 ? "deleteLine":"")">
                             @for (var b = 0; b < Model.Highlighted[i].Before.Count; ++b)
                             {
                                 @if (b % 2 == 0)
@@ -34,18 +34,18 @@
                                 else
                                 {<span class="deleteBlock">@Model.Highlighted[i].Before[b]</span>}
                             }
-                    </td>
-                }
-                else
-                {
-                    <td></td>
-                    <td></td>
-                }
-                @if (Model.Highlighted[i].After != null)
-                {
-                    afterIndex += 1;
-                    <td class="lineNumberBlock">@afterIndex</td>
-                    <td class="@(Model.Highlighted[i].After.Count > 1 ? "insertLine":"")">
+                        </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                    @if (Model.Highlighted[i].After != null)
+                    {
+                        afterIndex += 1;
+                        <td class="lineNumberBlock">@afterIndex</td>
+                        <td class="@(Model.Highlighted[i].After.Count > 1 ? "insertLine":"")">
                             @for (var b = 0; b < Model.Highlighted[i].After.Count; ++b)
                             {
                                 @if (b % 2 == 0)
@@ -53,14 +53,14 @@
                                 else
                                 {<span class="insertBlock">@Model.Highlighted[i].After[b]</span>}
                             }
-                    </td>
-                }
-                else
-                {
-                    <td></td>
-                    <td></td>
-                }
-            </tr>
+                        </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                </tr>
             }
         </table>
     </div>
