@@ -10,6 +10,10 @@
     grid-area: submit;
 }
 
+.jsLib {
+    text-align: right;
+}
+
 .computed {
     background-color: #EEEEEE;
     grid-area: computed;
@@ -23,7 +27,7 @@
     grid-gap: 5px;
     grid-template-areas:
         "before         after"
-        "submit         ."
+        "submit         jsLib"
         "computed       computed";
 }
 

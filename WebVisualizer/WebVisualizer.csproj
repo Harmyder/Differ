@@ -8,4 +8,8 @@
     <ProjectReference Include="..\DifferLib\DifferLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\DifferLibJS\" />
+  </ItemGroup>
+
 </Project>
