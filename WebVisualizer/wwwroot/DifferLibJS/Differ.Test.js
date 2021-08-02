@@ -1,13 +1,3 @@
-class Assert {
-    static AreEqual(expected, actual)
-    {
-        if (JSON.stringify(expected) !== JSON.stringify(actual))
-        {
-            throw "";
-        }
-    }
-}
-
 function testSameStringsSingleton()
 {
     [deletes, inserts] = compute("a", "a");

@@ -82,8 +82,6 @@ namespace DifferLib
 
             for (int nonDiagonalCount = 1; nonDiagonalCount <= TextFrom.Length + TextTo.Length; nonDiagonalCount++)
             {
-                //var minDiagonalIndex = Math.Max(-nonDiagonalCount, -TextTo.Length + (nonDiagonalCount - TextTo.Length) % 2);
-                //var maxDiagonalIndex = Math.Min(nonDiagonalCount, TextFrom.Length - (nonDiagonalCount - TextFrom.Length) % 2);
                 var minDiagonalIndex = -nonDiagonalCount;
                 var maxDiagonalIndex = nonDiagonalCount;
 
