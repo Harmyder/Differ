@@ -11,42 +11,44 @@ class SubstringDescriptor
     }
 }
 
-function compute(textFrom, textTo)
-{
-    const steps = computeInternal(textFrom, textTo);
-
-    const deletes = new Array();
-    const inserts = new Array();
-
-    let curX = 0;
-    let curY = 0;
-
-    for (let i = 0; i < steps.length;)
+class Differ {
+    static compute(textFrom, textTo)
     {
-        let span = 0;
-        switch (steps[i])
+        const steps = computeInternal(textFrom, textTo);
+
+        const deletes = new Array();
+        const inserts = new Array();
+
+        let curX = 0;
+        let curY = 0;
+
+        for (let i = 0; i < steps.length;)
         {
-            case StepId.Diagonal:
-                ++curX;
-                ++curY;
-                ++span;
-                break;
-            case StepId.Horizontal:
-                while (steps.length > i + ++span && steps[i + span] == StepId.Horizontal) ;
-                deletes.push(new SubstringDescriptor(curX, span));
-                curX += span;
-                break;
-            case StepId.Vertical:
-                while (steps.length > i + ++span && steps[i + span] == StepId.Vertical) ;
-                inserts.push(new SubstringDescriptor(curY, span));
-                curY += span;
-                break;
+            let span = 0;
+            switch (steps[i])
+            {
+                case StepId.Diagonal:
+                    ++curX;
+                    ++curY;
+                    ++span;
+                    break;
+                case StepId.Horizontal:
+                    while (steps.length > i + ++span && steps[i + span] == StepId.Horizontal) ;
+                    deletes.push(new SubstringDescriptor(curX, span));
+                    curX += span;
+                    break;
+                case StepId.Vertical:
+                    while (steps.length > i + ++span && steps[i + span] == StepId.Vertical) ;
+                    inserts.push(new SubstringDescriptor(curY, span));
+                    curY += span;
+                    break;
+            }
+
+            i += span;
         }
 
-        i += span;
+        return [deletes, inserts];
     }
-
-    return [deletes, inserts];
 }
 
 const StepId = {

@@ -20,6 +20,12 @@
     white-space: nowrap;
 }
 
+.computedJS {
+    background-color: #EEEEEE;
+    grid-area: computedJS;
+    white-space: nowrap;
+}
+
 .wrapper {
     display: grid;
     grid-template-columns: 50% 50%;
@@ -28,7 +34,8 @@
     grid-template-areas:
         "before         after"
         "submit         jsLib"
-        "computed       computed";
+        "computed       computed"
+        "computedJS     computedJS";
 }
 
 .lineNumberBlock {

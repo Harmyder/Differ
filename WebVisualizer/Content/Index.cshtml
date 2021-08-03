@@ -11,13 +11,14 @@
 <script src="~/DifferLibJS/Highlighter.js"></script>
 <script src="~/DifferLibJS/Highlighter.Test.js"></script>
 <script src="~/DifferLibJS/TestsRunner.js"></script>
+<script src="~/DifferLibJS/ComputeToView.js"></script>
 
 <form method="post" class="column">
     <div class="wrapper">
         <div class="before"><textarea id="before" name="before" rows="20" cols="100">@Model.Before</textarea></div>
         <div class="after"><textarea id="after" name="after" rows="20" cols="100">@Model.After</textarea></div>
-        <div class="submit"><input type="submit" value="Compute" /></div>
-        <div class="jsLib"><input type="button" value="Run JS test" onclick="runJsTests();" /></div>
+        <div class="submit"><input type="submit" value="Compute C#" /></div>
+        <div class="jsLib"><input type="button" value="Compute JS" onclick="computeJS()" /><input type="button" value="Run JS test" onclick="runJsTests();" /></div>
         <table class="computed">
             @for (int i = 0, beforeIndex = 0, afterIndex = 0; i < Model.Highlighted.Length; ++i)
             {
@@ -63,5 +64,16 @@
                 </tr>
             }
         </table>
+        <table class="computedJS" id="computedJS">
+        </table>
     </div>
 </form>
+
+<script>
+    function computeJS() {
+        const table = document.getElementById('computedJS');
+        const before = document.getElementById('before').value;
+        const after = document.getElementById('after').value;
+        computeToView(table, before, after);
+    }
+</script>
