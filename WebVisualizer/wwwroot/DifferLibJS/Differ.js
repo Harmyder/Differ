@@ -136,7 +136,7 @@ function computeInternal(textFrom, textTo)
 
         for (let curDiagonal = minDiagonalIndex; curDiagonal <= maxDiagonalIndex; curDiagonal += 2)
         {
-            curDiagPath = new Path();
+            let curDiagPath = new Path();
             if (curDiagonal != minDiagonalIndex && (curDiagonal == maxDiagonalIndex || paths.getPath(curDiagonal - 1).x > paths.getPath(curDiagonal + 1).x))
             {
                 curDiagPath = paths.getPath(curDiagonal - 1);

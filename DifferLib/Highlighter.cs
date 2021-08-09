@@ -6,7 +6,11 @@ namespace DifferLib
 {
     public static class Highlighter
     {
-        public static List<(HighlightedLine Before, HighlightedLine After)> Highlight(string before, string after, List<SubstringDescriptor> deleteDescs, List<SubstringDescriptor> insertDescs)
+        public static List<(HighlightedLine Before, HighlightedLine After)> Highlight(
+            string before,
+            string after,
+            IReadOnlyList<SubstringDescriptor> deleteDescs,
+            IReadOnlyList<SubstringDescriptor> insertDescs)
         {
             if (before == null) throw new ArgumentNullException(nameof(before));
             if (after == null) throw new ArgumentNullException(nameof(after));
@@ -86,7 +90,7 @@ namespace DifferLib
 
         private static HighlightedLine[] ComputeLines(
             string source,
-            List<SubstringDescriptor> descs)
+            IReadOnlyList<SubstringDescriptor> descs)
         {
             var sourceIndex = 0;
             var curDescIndex = 0;
