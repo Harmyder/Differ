@@ -49,12 +49,6 @@ namespace DifferLib.Tests
         public void TestLengthOneDelete() => Test("a", "");
 
         [TestMethod]
-        public void TestLengthOneInsert() => Test("", "a");
-
-        [TestMethod]
-        public void TestLongInsert() => Test("", "aaa");
-
-        [TestMethod]
         public void TestLongDelete() => Test("aaa", "");
 
         [TestMethod]
@@ -63,58 +57,38 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestLines() => Test(new[] { "abc", "def", "ghi" }, new[] { "abc", "def", "jkl" });
 
-        private void Test(string from, string to, int? nonDiagonalCount = null) => TestInternal<char>(from.ToCharArray(), to.ToCharArray(), nonDiagonalCount);
+        [TestMethod]
+        public void TestIterations() => Test("abcdefgh", "a1b2c3d4e5f6g7h8");
 
-        private void Test(string[] from, string[] to, int? nonDiagonalCount = null) => TestInternal<string>(from, to, nonDiagonalCount);
+        private void Test(string from, string to, int? nonDiagonalCount = null)
+        {
+            TestInternal(from.ToCharArray(), to.ToCharArray(), nonDiagonalCount);
+            TestInternal(to.ToCharArray(), from.ToCharArray(), nonDiagonalCount);
+        }
+
+        private void Test(string[] from, string[] to, int? nonDiagonalCount = null) => TestInternal(from, to, nonDiagonalCount);
 
         private void TestInternal<T>(T[] from, T[] to, int? nonDiagonalCount = null)
         {
             var differ = new Differ<T>(from, to);
             var (deletes, inserts) = differ.Compute();
-            var actual = ApplyOperations(from.ToList(), to.ToList(), deletes, inserts).ToArray();
-            Assert.IsTrue(Enumerable.SequenceEqual(to, actual));
+            AssertConsistency(from.ToList(), to.ToList(), deletes, inserts);
             if (nonDiagonalCount != null) Assert.AreEqual(nonDiagonalCount, deletes.Count + inserts.Count);
         }
 
-        private List<T> ApplyOperations<T>(List<T> from, List<T> to, IReadOnlyList<SubstringDescriptor> deletes, IReadOnlyList<SubstringDescriptor> inserts)
+        private void AssertConsistency<T>(List<T> from, List<T> to, IReadOnlyList<SubstringDescriptor> deletes, IReadOnlyList<SubstringDescriptor> inserts)
         {
-            var insertIndex = inserts.Count - 1;
-            var deleteIndex = deletes.Count - 1;
-
-            var insertedCount = 0;
-
-            for (int i = from.Count; i >= 0; --i)
+            foreach (var delete in deletes.Reverse())
             {
-                var shouldInsert = false;
-                var shouldDelete = false;
-
-                if (insertIndex >= 0)
-                {
-                    var aliveCount = to.Count - inserts[insertIndex].Start - (insertedCount + inserts[insertIndex].Length);
-
-                    if (from.Count - aliveCount == i)
-                    {
-                        shouldInsert = true;
-                        from.InsertRange(i, to.GetRange(inserts[insertIndex].Start, inserts[insertIndex].Length));
-                        insertedCount += inserts[insertIndex].Length;
-                        insertIndex -= 1;
-                    }
-                }
-
-                if (deleteIndex >= 0 && deletes[deleteIndex].Start == i)
-                {
-                    shouldDelete = true;
-                    from.RemoveRange(i, deletes[deleteIndex].Length);
-                    deleteIndex -= 1;
-                }
-
-                if (shouldInsert && shouldDelete)
-                {
-                    throw new InvalidProgramException();
-                }
+                from.RemoveRange(delete.Start, delete.Length);
             }
 
-            return from;
+            foreach (var insert in inserts.Reverse())
+            {
+                to.RemoveRange(insert.Start, insert.Length);
+            }
+
+            Assert.AreEqual(string.Join("", from), string.Join("", to.ToArray()));
         }
     }
 }
