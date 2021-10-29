@@ -31,6 +31,8 @@ function testLengthOneDelete() { testInternal("a", ""); }
 
 function testLengthOneInsert() { testInternal("", "a"); }
 
+function TestMoreDiagonalPreferable() { testInternal("abc", "axb", 2); }
+
 function testLongInsert() { testInternal("", "aaa"); }
 
 function testLongDelete() { testInternal("aaa", ""); }
@@ -40,48 +42,19 @@ function testOptimality() { testInternal("abceb", "acbd", 3); }
 function testInternal(from, to, nonDiagonalCount)
 {
     [deletes, inserts] = Differ.compute(from, to);
-    var actual = applyOperations(from, to, deletes, inserts);
-    Assert.AreEqual(to, actual);
+    AssertConsistency(from, to, deletes, inserts);
     if (nonDiagonalCount) Assert.AreEqual(nonDiagonalCount, deletes.length + inserts.length);
 }
 
-function applyOperations(from, to, deletes, inserts)
+function AssertConsistency(from, to, deletes, inserts)
 {
-    let insertIndex = inserts.length - 1;
-    let deleteIndex = deletes.length - 1;
-
-    let insertedCount = 0;
-
-    for (let i = from.length; i >= 0; --i)
-    {
-        let shouldInsert = false;
-        let shouldDelete = false;
-
-        if (insertIndex >= 0)
-        {
-            const aliveCount = to.length - inserts[insertIndex].start - (insertedCount + inserts[insertIndex].length);
-
-            if (from.length - aliveCount == i)
-            {
-                shouldInsert = true;
-                from = from.slice(0, i) + to.slice(inserts[insertIndex].start, inserts[insertIndex].end) + from.slice(i);
-                insertedCount += inserts[insertIndex].length;
-                insertIndex -= 1;
-            }
-        }
-
-        if (deleteIndex >= 0 && deletes[deleteIndex].start == i)
-        {
-            shouldDelete = true;
-            from = from.slice(0, i) + from.slice(i + deletes[deleteIndex].length);
-            deleteIndex -= 1;
-        }
-
-        if (shouldInsert && shouldDelete)
-        {
-            throw "";
-        }
+    for (let i = deletes.length - 1; i >= 0; --i) {
+        from = from.substring(0, deletes[i].start) + from.substring(deletes[i].end);
     }
 
-    return from;
+    for (let i = inserts.length - 1; i >= 0; --i) {
+        to = to.substring(0, inserts[i].start) + to.substring(inserts[i].end);
+    }
+
+    Assert.AreEqual(from, to);
 }

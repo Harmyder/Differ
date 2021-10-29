@@ -49,6 +49,9 @@ namespace DifferLib.Tests
         public void TestLengthOneDelete() => Test("a", "");
 
         [TestMethod]
+        public void TestMoreDiagonalPreferable() => Test("abc", "axb", 2);
+
+        [TestMethod]
         public void TestLongDelete() => Test("aaa", "");
 
         [TestMethod]

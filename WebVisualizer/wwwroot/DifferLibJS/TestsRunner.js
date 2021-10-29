@@ -5,6 +5,7 @@
     runSingleTest("testLineMatching");
     runSingleTest("testLengthOneDelete");
     runSingleTest("testLengthOneInsert");
+    runSingleTest("TestMoreDiagonalPreferable");
     runSingleTest("testLongInsert");
     runSingleTest("testLongDelete");
     runSingleTest("testOptimality");

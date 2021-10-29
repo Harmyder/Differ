@@ -88,7 +88,8 @@ namespace DifferLib
                 for (int curDiagonal = minDiagonalIndex; curDiagonal <= maxDiagonalIndex; curDiagonal += 2)
                 {
                     Path curDiagPath;
-                    if (curDiagonal != minDiagonalIndex && (curDiagonal == maxDiagonalIndex || paths[curDiagonal - 1].X > paths[curDiagonal + 1].X))
+                    // If both neighboring paths have the same X, then the -1 one has more diagonal elements
+                    if (curDiagonal != minDiagonalIndex && (curDiagonal == maxDiagonalIndex || paths[curDiagonal - 1].X >= paths[curDiagonal + 1].X))
                     {
                         curDiagPath = paths[curDiagonal - 1];
                         curDiagPath.AppendHorizontal();
