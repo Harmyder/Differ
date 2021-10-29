@@ -40,14 +40,14 @@ namespace WebVisualizer.Content
             List<SubstringDescriptor> inserts;
             if (shouldPreferLines)
             {
-                var beforeLines = Before.Split('\n');
-                var afterLines = After.Split('\n');
+                var (beforeLines, beforeEols) = Split(Before);
+                var (afterLines, afterEols) = Split(After);
 
                 var differ = new Differ<string>(beforeLines, afterLines);
                 var (lineDeletes, lineInserts) = differ.Compute();
 
-                var charDeletes = LinesToChars(beforeLines, lineDeletes);
-                var charInserts = LinesToChars(afterLines, lineInserts);
+                var charDeletes = LinesToChars(beforeLines, beforeEols, lineDeletes);
+                var charInserts = LinesToChars(afterLines, afterEols, lineInserts);
 
                 deletes = new List<SubstringDescriptor>(charDeletes);
                 inserts = new List<SubstringDescriptor>(charInserts);
@@ -98,14 +98,51 @@ namespace WebVisualizer.Content
             Highlighted = highlighted.Select(h => (h.Before?.Blocks, h.After?.Blocks)).ToArray();
         }
 
-        private List<SubstringDescriptor> LinesToChars(string[] lines, List<SubstringDescriptor> descriptors)
+        private (string[] Lines, int[] Eols) Split(string text)
+        {
+            var lines = new List<string>();
+            var eols = new List<int>();
+
+            var prevLineEnd = 0;
+            var isWindowsEol = false;
+
+            for (int i = 0; i < text.Length; ++i)
+            {
+                if (text[i] == '\n')
+                {
+                    if (isWindowsEol)
+                    {
+                        eols.Add(2);
+                        lines.Add(text.Substring(prevLineEnd, i - 1 - prevLineEnd));
+                    }
+                    else
+                    {
+                        eols.Add(1);
+                        lines.Add(text.Substring(prevLineEnd, i - prevLineEnd));
+                    }
+
+                    prevLineEnd = i + 1;
+                }
+                isWindowsEol = text[i] == '\r';
+            }
+
+            if (prevLineEnd != text.Length)
+            {
+                eols.Add(0);
+                lines.Add(text.Substring(prevLineEnd));
+            }
+
+            return (lines.ToArray(), eols.ToArray());
+        }
+
+        private List<SubstringDescriptor> LinesToChars(string[] lines, int[] eols, List<SubstringDescriptor> descriptors)
         {
             var beforeLinesIndices = new int[lines.Length + 1];
             for (var i = 0; i < lines.Length; ++i)
             {
-                beforeLinesIndices[i + 1] = beforeLinesIndices[i] + lines[i].Length + 1;
+                beforeLinesIndices[i + 1] = beforeLinesIndices[i] + lines[i].Length + eols[i];
             }
-            --beforeLinesIndices[^1];
+            //beforeLinesIndices[^1] -= eols[^1];
 
             var charDeletes = new List<SubstringDescriptor>();
             for (var i = 0; i < descriptors.Count; ++i)
