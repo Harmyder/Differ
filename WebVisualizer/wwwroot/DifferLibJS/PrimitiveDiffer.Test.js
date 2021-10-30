@@ -1,27 +1,27 @@
 function testSameStringsSingleton()
 {
-    [deletes, inserts] = Differ.compute("a", "a");
+    [deletes, inserts] = PrimitiveDiffer.compute("a", "a");
     Assert.AreEqual(0, deletes.length);
     Assert.AreEqual(0, inserts.length);
 }
 
 function testSameStringsMultichars()
 {
-    [deletes, inserts] = Differ.compute("abc", "abc");
+    [deletes, inserts] = PrimitiveDiffer.compute("abc", "abc");
     Assert.AreEqual(0, deletes.length);
     Assert.AreEqual(0, inserts.length);
 }
 
 function testEmpty()
 {
-    [deletes, inserts] = Differ.compute("", "");
+    [deletes, inserts] = PrimitiveDiffer.compute("", "");
     Assert.AreEqual(0, deletes.length);
     Assert.AreEqual(0, inserts.length);
 }
 
 function testLineMatching()
 {
-    [deletes, _] = Differ.compute("_\n*\n", "*\n");
+    [deletes, _] = PrimitiveDiffer.compute("_\n*\n", "*\n");
     Assert.AreEqual(1, deletes.length);
     Assert.AreEqual(0, deletes[0].start);
     Assert.AreEqual(2, deletes[0].length);
@@ -41,7 +41,7 @@ function testOptimality() { testInternal("abceb", "acbd", 3); }
 
 function testInternal(from, to, nonDiagonalCount)
 {
-    [deletes, inserts] = Differ.compute(from, to);
+    [deletes, inserts] = PrimitiveDiffer.compute(from, to);
     AssertConsistency(from, to, deletes, inserts);
     if (nonDiagonalCount) Assert.AreEqual(nonDiagonalCount, deletes.length + inserts.length);
 }

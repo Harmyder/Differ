@@ -20,6 +20,8 @@
     //runSingleTest("testChangeFullLine");
     runSingleTest("testChangeFullLastLine");
     runSingleTest("testInsertLine");
+
+    runSingleTest("testDifference");
 }
 
 function runSingleTest(testName) {

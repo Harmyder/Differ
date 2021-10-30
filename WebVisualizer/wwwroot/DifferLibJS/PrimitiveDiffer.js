@@ -11,7 +11,7 @@ class SubstringDescriptor
     }
 }
 
-class Differ {
+class PrimitiveDiffer {
     static compute(textFrom, textTo)
     {
         const steps = computeInternal(textFrom, textTo);

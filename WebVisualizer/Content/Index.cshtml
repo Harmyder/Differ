@@ -6,8 +6,10 @@
 
 <link rel="stylesheet" href="~/css/highlighter.css">
 <script src="~/DifferLibJS/Assert.js"></script>
-<script src="~/DifferLibJS/Differ.js"></script>
-<script src="~/DifferLibJS/Differ.Test.js"></script>
+<script src="~/DifferLibJS/PrimitiveDiffer.js"></script>
+<script src="~/DifferLibJS/PrimitiveDiffer.Test.js"></script>
+<script src="~/DifferLibJS/DifferWrapper.js"></script>
+<script src="~/DifferLibJS/DifferWrapper.Test.js"></script>
 <script src="~/DifferLibJS/Highlighter.js"></script>
 <script src="~/DifferLibJS/Highlighter.Test.js"></script>
 <script src="~/DifferLibJS/TestsRunner.js"></script>
@@ -17,7 +19,7 @@
     <div class="wrapper">
         <div class="before"><textarea id="before" name="before" rows="20" cols="100">@Model.Before</textarea></div>
         <div class="after"><textarea id="after" name="after" rows="20" cols="100">@Model.After</textarea></div>
-        <div class="submit"><label><input type="checkbox" value="true" name="shouldPreferLines" checked />Prefer lines</label> <input type="submit" value="Compute C#" /></div>
+        <div class="submit"><label><input type="checkbox" value="true" name="shouldPreferLines" id="shouldPreferLines" checked />Prefer lines</label> <input type="submit" value="Compute C#" /></div>
         <div class="jsLib"><input type="button" value="Compute JS" onclick="computeJS()" /><input type="button" value="Run JS test" onclick="runJsTests();" /></div>
         <table class="computed">
             @for (int i = 0, beforeIndex = 0, afterIndex = 0; i < Model.Highlighted.Length; ++i)
@@ -74,6 +76,7 @@
         const table = document.getElementById('computedJS');
         const before = document.getElementById('before').value;
         const after = document.getElementById('after').value;
-        computeToView(table, before, after);
+        const shouldPreferLines = document.getElementById("shouldPreferLines").checked;
+        computeToView(table, before, after, shouldPreferLines);
     }
 </script>

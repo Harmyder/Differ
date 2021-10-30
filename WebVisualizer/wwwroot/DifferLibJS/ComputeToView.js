@@ -1,5 +1,5 @@
-﻿function computeToView(table, before, after) {
-    const [deletes, inserts] = Differ.compute(before, after);
+﻿function computeToView(table, before, after, shouldPreferLines) {
+    const [deletes, inserts] = DifferWrapper.compute(before, after, shouldPreferLines);
 
     const highlighted = Highlighter.highlight(before, after, deletes, inserts);
 

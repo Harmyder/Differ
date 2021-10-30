@@ -47,6 +47,21 @@ namespace DifferLib.Tests
             Assert.IsFalse(0 == deletes.Count + inserts.Count);
         }
 
+        [DataRow(true)]
+        [DataRow(false)]
+        [DataTestMethod]
+        public void TestDiffHasFullEol(bool shouldPreferLines)
+        {
+            var before = "a\r\ncommon\nb\n";
+            var after = "common\n";
+
+            var (deletes, inserts) = DifferWrapper.Compute(before, after, shouldPreferLines);
+
+            Assert.AreEqual(2, deletes.Count);
+            Assert.AreEqual(3, deletes[0].Length);
+            Assert.AreEqual(2, deletes[1].Length);
+        }
+
         private string CombineLines(bool isWindows, params string[] lines)
         {
             var eol = isWindows ? "\r\n" : "\n";

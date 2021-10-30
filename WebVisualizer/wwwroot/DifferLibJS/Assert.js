@@ -6,4 +6,10 @@
             }
         }
     }
+
+    static IsTrue(value) {
+        if (!value) {
+            throw "";
+        }
+    }
 }
