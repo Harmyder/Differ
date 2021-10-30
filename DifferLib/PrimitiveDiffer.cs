@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace DifferLib
 {
-    public sealed class Differ<T>
+    public sealed class PrimitiveDiffer<T>
     {
         private T[] TextFrom { get; }
         private T[] TextTo { get; }
 
-        public Differ(T[] textFrom, T[] textTo)
+        public PrimitiveDiffer(T[] textFrom, T[] textTo)
         {
             TextFrom = textFrom;
             TextTo = textTo;

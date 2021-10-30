@@ -6,12 +6,12 @@ using System.Linq;
 namespace DifferLib.Tests
 {
     [TestClass]
-    public class DifferTests
+    public class PrimitiveDifferTests
     {
         [TestMethod]
         public void TestSameStringsSingleton()
         {
-            var differ = new Differ<char>("a".ToCharArray(), "a".ToCharArray());
+            var differ = new PrimitiveDiffer<char>("a".ToCharArray(), "a".ToCharArray());
             var (deleted, inserted) = differ.Compute();
             Assert.IsFalse(deleted.Any());
             Assert.IsFalse(inserted.Any());
@@ -20,7 +20,7 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestSameStringsMultichars()
         {
-            var differ = new Differ<char>("abc".ToCharArray(), "abc".ToCharArray());
+            var differ = new PrimitiveDiffer<char>("abc".ToCharArray(), "abc".ToCharArray());
             var (deleted, inserted) = differ.Compute();
             Assert.IsFalse(deleted.Any());
             Assert.IsFalse(inserted.Any());
@@ -29,7 +29,7 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestEmpty()
         {
-            var differ = new Differ<char>("".ToCharArray(), "".ToCharArray());
+            var differ = new PrimitiveDiffer<char>("".ToCharArray(), "".ToCharArray());
             var (deleted, inserted) = differ.Compute();
             Assert.IsFalse(deleted.Any());
             Assert.IsFalse(inserted.Any());
@@ -38,7 +38,7 @@ namespace DifferLib.Tests
         [TestMethod]
         public void TestLineMatching()
         {
-            var differ = new Differ<char>("_\n*\n".ToCharArray(), "*\n".ToCharArray());
+            var differ = new PrimitiveDiffer<char>("_\n*\n".ToCharArray(), "*\n".ToCharArray());
             var (deletes, _) = differ.Compute();
             Assert.AreEqual(1, deletes.Count);
             Assert.AreEqual(0, deletes[0].Start);
@@ -73,7 +73,7 @@ namespace DifferLib.Tests
 
         private void TestInternal<T>(T[] from, T[] to, int? nonDiagonalCount = null)
         {
-            var differ = new Differ<T>(from, to);
+            var differ = new PrimitiveDiffer<T>(from, to);
             var (deletes, inserts) = differ.Compute();
             AssertConsistency(from.ToList(), to.ToList(), deletes, inserts);
             if (nonDiagonalCount != null) Assert.AreEqual(nonDiagonalCount, deletes.Count + inserts.Count);

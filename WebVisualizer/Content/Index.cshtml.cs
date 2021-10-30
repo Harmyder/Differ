@@ -43,7 +43,7 @@ namespace WebVisualizer.Content
                 var (beforeLines, beforeEols) = Split(Before);
                 var (afterLines, afterEols) = Split(After);
 
-                var differ = new Differ<string>(beforeLines, afterLines);
+                var differ = new PrimitiveDiffer<string>(beforeLines, afterLines);
                 var (lineDeletes, lineInserts) = differ.Compute();
 
                 var charDeletes = LinesToChars(beforeLines, beforeEols, lineDeletes);
@@ -65,7 +65,7 @@ namespace WebVisualizer.Content
                     {
                         var from = Before.Substring(charDeletes[currLineDeleteIndex].Start, charDeletes[currLineDeleteIndex].Length);
                         var to = After.Substring(charInserts[currLineInsertIndex].Start, charInserts[currLineInsertIndex].Length);
-                        var localDiffer = new Differ<char>(from.ToCharArray(), to.ToCharArray());
+                        var localDiffer = new PrimitiveDiffer<char>(from.ToCharArray(), to.ToCharArray());
                         var (localDeletes, localInserts) = localDiffer.Compute();
 
                         var localDeletesWithOffset = localDeletes.Select(x => new SubstringDescriptor(x.Start + charDeletes[currLineDeleteIndex].Start, x.Length)).ToList();
@@ -89,7 +89,7 @@ namespace WebVisualizer.Content
             }
             else
             {
-                var differ = new Differ<char>(Before.ToCharArray(), After.ToCharArray());
+                var differ = new PrimitiveDiffer<char>(Before.ToCharArray(), After.ToCharArray());
                 (deletes, inserts) = differ.Compute();
             }
 
