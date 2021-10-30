@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace DifferLib
+namespace DifferLib.Highlight
 {
-    public sealed class HighlightedLineFactory
+    internal sealed class HighlightedLineFactory
     {
         private List<string> _blocks = new List<string>();
 

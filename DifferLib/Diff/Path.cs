@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
-namespace DifferLib
+namespace DifferLib.Diff
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class Path

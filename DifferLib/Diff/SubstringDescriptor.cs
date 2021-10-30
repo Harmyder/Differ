@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace DifferLib
+namespace DifferLib.Diff
 {
     [DebuggerDisplay("Start:{Start}, Length:{Length}")]
     public struct SubstringDescriptor

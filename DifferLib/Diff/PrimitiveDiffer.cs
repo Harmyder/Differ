@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DifferLib
+namespace DifferLib.Diff
 {
     public sealed class PrimitiveDiffer<T>
     {

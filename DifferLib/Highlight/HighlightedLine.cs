@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DifferLib
+namespace DifferLib.Highlight
 {
     public sealed class HighlightedLine
     {

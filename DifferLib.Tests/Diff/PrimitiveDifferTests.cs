@@ -1,9 +1,10 @@
+using DifferLib.Diff;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DifferLib.Tests
+namespace DifferLib.Tests.Diff
 {
     [TestClass]
     public class PrimitiveDifferTests

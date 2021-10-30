@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DifferLib.Diff;
+using DifferLib.Highlight;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace DifferLib.Tests
+namespace DifferLib.Tests.Highlight
 {
     [TestClass]
     public sealed class HighlighterTests

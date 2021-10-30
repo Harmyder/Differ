@@ -1,4 +1,4 @@
-﻿namespace DifferLib
+﻿namespace DifferLib.Diff
 {
     internal enum StepId
     {
