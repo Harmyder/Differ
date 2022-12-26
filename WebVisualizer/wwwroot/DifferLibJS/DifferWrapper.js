@@ -25,8 +25,8 @@
                     const to = after.substring(charInserts[currLineInsertIndex].start, charInserts[currLineInsertIndex].end);
                     const [localDeletes, localInserts] = PrimitiveDiffer.compute(from, to);
 
-                    const localDeletesWithOffset = localDeletes.map(x => new SubstringDescriptor(x.Start + charDeletes[currLineDeleteIndex].start, x.end));
-                    const localInsertsWithOffset = localInserts.map(x => new SubstringDescriptor(x.Start + charInserts[currLineInsertIndex].start, x.end));
+                    const localDeletesWithOffset = localDeletes.map(x => new SubstringDescriptor(x.start + charDeletes[currLineDeleteIndex].start, x.end));
+                    const localInsertsWithOffset = localInserts.map(x => new SubstringDescriptor(x.start + charInserts[currLineInsertIndex].start, x.end));
 
                     deletes.splice(currLineDeleteIndex, 1);
                     inserts.splice(currLineInsertIndex, 1);
